@@ -607,7 +607,7 @@ struct tm* localtime(const time_t* clock)
 struct tm* gmtime(const time_t* clock)
 {
 	FILETIME	ftUtc;
-	SYSTEMTIME stUtc;
+	SYSTEMTIME stToUtc;
 
 	if (clock == NULL)
 		return NULL;
@@ -616,19 +616,19 @@ struct tm* gmtime(const time_t* clock)
 	UnixTimeToFileTime(*clock,&ftUtc);
 
 	// convert to SYSTEMTIME
-	if (!FileTimeToSystemTime(&ftUtc, &stUtc))
+	if (!FileTimeToSystemTime(&ftUtc, &stToUtc))
 		return NULL;
 
-	stUtc.wMilliseconds = 500;
+	stToUtc.wMilliseconds = 500;
 	// fill return structure
-	st_tm.tm_sec = stUtc.wSecond;
-	st_tm.tm_min = stUtc.wMinute;
-	st_tm.tm_hour = stUtc.wHour;
-	st_tm.tm_mday = stUtc.wDay;
-	st_tm.tm_mon = stUtc.wMonth;
-	st_tm.tm_year = stUtc.wYear;
-	st_tm.tm_wday = stUtc.wDayOfWeek;
-	st_tm.tm_yday = dayOfYear(stUtc.wYear, stUtc.wMonth-1, stUtc.wDay);
+	st_tm.tm_sec = stToUtc.wSecond;
+	st_tm.tm_min = stToUtc.wMinute;
+	st_tm.tm_hour = stToUtc.wHour;
+	st_tm.tm_mday = stToUtc.wDay;
+	st_tm.tm_mon = stToUtc.wMonth - 1;
+	st_tm.tm_year = stToUtc.wYear - 1900;
+	st_tm.tm_wday = stToUtc.wDayOfWeek;
+	st_tm.tm_yday = dayOfYear(stToUtc.wYear, stToUtc.wMonth-1, stToUtc.wDay);
 	st_tm.tm_isdst = 0;
 
 	return &st_tm;

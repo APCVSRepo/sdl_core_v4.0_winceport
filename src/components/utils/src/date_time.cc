@@ -83,10 +83,11 @@ void clock_gettime(int i, timespec * tm)
 		tm->tv_nsec = (cur % 1000) * 1000000;
 	}
 	else if (i == CLOCK_REALTIME) {
-		time_t t;
-		::time(&t);
-		tm->tv_sec = t;
-		tm->tv_nsec = 0;
+		uint64_t curr = clock();
+		//convert microseconds to seconds and place in the seconds value
+		//The module picks up the microseconds
+		tm->tv_sec = static_cast<long> (win32_system_time_ + curr/ 1000);
+		tm->tv_nsec = static_cast<long> ((curr % 1000) * 1000000);
 	}
     else {
         assert(false);

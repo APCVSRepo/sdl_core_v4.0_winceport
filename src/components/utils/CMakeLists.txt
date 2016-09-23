@@ -98,7 +98,7 @@ set (SOURCES
     ${UTILS_SRC_DIR}/timer.cc
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
   list (APPEND SOURCES
     ${UTILS_SRC_DIR}/global.cc
   )

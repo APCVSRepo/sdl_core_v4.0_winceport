@@ -22,7 +22,9 @@
 #ifndef __wcecompat__ERRNO_H__
 #define __wcecompat__ERRNO_H__
 #include <windows.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

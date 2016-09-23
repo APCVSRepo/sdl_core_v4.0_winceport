@@ -26,7 +26,9 @@
 extern "C" {
 #endif
 
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <time_ext.h>
 
 struct timeb

@@ -81,7 +81,7 @@ void* Thread::threadFunc(void* arg) {
 
   threads::Thread* thread = reinterpret_cast<Thread*>(arg);
   DCHECK(thread);
-
+  thread->finalized_ = false;
   pthread_cleanup_push(&cleanup, thread);
 
     thread->state_lock_.Acquire();
@@ -157,8 +157,8 @@ Thread::Thread(const char* name, ThreadDelegate* delegate)
 #endif
       thread_options_(),
       isThreadRunning_(0),
-      stopped_(false),
-      finalized_(false),
+      stopped_(true),
+      finalized_(true),
       thread_created_(false) {
 #if defined(OS_WIN32) || defined(OS_WINCE)
           handle_.p = NULL;
@@ -191,6 +191,14 @@ bool Thread::start(const ThreadOptions& options) {
                   "Cannot start thread " << name_ << ": delegate is NULL");
     // 0 - state_lock unlocked
     return false;
+  }
+
+  if (!finalized_) {
+    if (stopped_) {
+      stopped_ = false;
+      run_cond_.NotifyOne();
+    }
+    return true;
   }
 
   if (isThreadRunning_) {

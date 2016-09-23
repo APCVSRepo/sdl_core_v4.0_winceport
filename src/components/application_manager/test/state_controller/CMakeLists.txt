@@ -53,4 +53,6 @@ set(SOURCES
 
 create_test("state_controller_test" "${SOURCES}" "${LIBRARIES}")
 
+add_dependencies(state_controller_test MessageHelper)
+
 endif()

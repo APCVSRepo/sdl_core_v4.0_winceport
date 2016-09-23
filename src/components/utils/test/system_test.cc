@@ -97,7 +97,7 @@ TEST(SystemTest, AddTwoArgsToCommand_CheckOrder_ExpectOrderCorrect) {
 
 TEST(SystemTest, SynchronousInvokeWithExistingCommand_ExpectSuccessfull) {
 #if defined(OS_WIN32) || defined(OS_WINCE)
-  const std::string test_command("./testscript.bat");
+  const std::string test_command("testscript.bat");
 #else
   const std::string test_command("./testscript.sh");
 #endif

@@ -49,6 +49,8 @@
 
 #ifdef OS_WINCE
 #include "time_ext.h"
+#include <sys/stat.h>
+#include "utils/global.h"
 #endif
 
 #define TLS1_1_MINIMAL_VERSION            0x1000103fL
@@ -189,14 +191,14 @@ bool CryptoManagerImpl::Init() {
   SSL_CTX_set_options(context_, SSL_OP_NO_SSLv2);
 
   set_certificate(get_settings().certificate_data());
-
   if (get_settings().ciphers_list().empty()) {
     LOG4CXX_WARN(logger_, "Empty ciphers list");
-  } else {
-      LOG4CXX_DEBUG(logger_, "Cipher list: " << get_settings().ciphers_list());
-      if (!SSL_CTX_set_cipher_list(context_, get_settings().ciphers_list().c_str())) {
-        LOG4CXX_ERROR(logger_, "Could not set cipher list: "
-                      << get_settings().ciphers_list());
+  }
+  else {
+    LOG4CXX_DEBUG(logger_, "Cipher list: " << get_settings().ciphers_list());
+    if (!SSL_CTX_set_cipher_list(context_, get_settings().ciphers_list().c_str())) {
+      LOG4CXX_ERROR(logger_, "Could not set cipher list: "
+        << get_settings().ciphers_list());
       return false;
     }
   }
@@ -207,23 +209,22 @@ bool CryptoManagerImpl::Init() {
 
   LOG4CXX_DEBUG(logger_, "Setting up CA certificate location");
   const int result = SSL_CTX_load_verify_locations(
-      context_, NULL, get_settings().ca_cert_path().c_str());
+    context_,NULL, get_settings().ca_cert_path().c_str());
 
   if (!result) {
     const unsigned long error = ERR_get_error();
     UNUSED(error);
     LOG4CXX_WARN(
-        logger_,
-        "Wrong certificate file '" << get_settings().ca_cert_path()
-        << "', err 0x" << std::hex << error
-        << " \"" << ERR_reason_error_string(error) << '"');
+      logger_,
+      "Wrong certificate file '" << get_settings().ca_cert_path()
+      << "', err 0x" << std::hex << error
+      << " \"" << ERR_reason_error_string(error) << '"');
   }
-
+  
   guard.Dismiss();
-
   const int verify_mode =
-      get_settings().verify_peer() ? SSL_VERIFY_PEER |
-                                     SSL_VERIFY_FAIL_IF_NO_PEER_CERT
+    get_settings().verify_peer() ? SSL_VERIFY_PEER |
+                                   SSL_VERIFY_FAIL_IF_NO_PEER_CERT
                                    : SSL_VERIFY_NONE;
   LOG4CXX_DEBUG(logger_, "Setting up peer verification in mode: " << verify_mode);
   SSL_CTX_set_verify(context_, verify_mode, &debug_callback);
@@ -248,7 +249,7 @@ SSLContext* CryptoManagerImpl::CreateSSLContext() {
   SSL *conn = SSL_new(context_);
   if (conn == NULL)
     return NULL;
-
+  conn->ctx = context_;
   if (get_settings().security_manager_mode() == SERVER) {
     SSL_set_accept_state(conn);
   } else {
@@ -274,16 +275,27 @@ std::string CryptoManagerImpl::LastError() const {
 bool CryptoManagerImpl::IsCertificateUpdateRequired() const {
   LOG4CXX_AUTO_TRACE(logger_);
 
-  const time_t now = time(NULL);
   const time_t cert_date = mktime(&expiration_time_);
 
+  if (cert_date == -1) {
+    LOG4CXX_WARN(logger_,
+                 "The certifiacte expiration time cannot be represented.");
+    return false;
+  }
+  const time_t now = time(NULL);
   const double seconds = difftime(cert_date, now);
   LOG4CXX_DEBUG(
       logger_,
       "Certificate time: " << asctime(&expiration_time_)
                            << ". Host time: " << asctime(localtime(&now))
                            << ". Seconds before expiration: " << seconds);
-  return seconds <= get_settings().update_before_hours();
+  if (seconds < 0) {
+    LOG4CXX_WARN(logger_, "Certificate is already expired.");
+    return true;
+  }
+
+  return seconds <= (get_settings().update_before_hours() *
+                     3600);
 }
 
 const CryptoManagerSettings& CryptoManagerImpl::get_settings() const {
@@ -296,7 +308,7 @@ bool CryptoManagerImpl::set_certificate(const std::string &cert_data) {
     LOG4CXX_WARN(logger_, "Empty certificate");
     return false;
   }
-
+  
   BIO* bio = BIO_new(BIO_f_base64());
   BIO* bmem = BIO_new_mem_buf((char*)cert_data.c_str(), cert_data.length());
   bmem = BIO_push(bio, bmem);
@@ -310,17 +322,17 @@ bool CryptoManagerImpl::set_certificate(const std::string &cert_data) {
     LOG4CXX_WARN(logger_, "Unable to update certificate. BIO not created");
     return false;
   }
-
+  
   utils::ScopeGuard bio_guard = utils::MakeGuard(BIO_free, bio_cert);
   UNUSED(bio_guard)
   int k = 0;
   if ((k = BIO_write(bio_cert, buf, len)) <= 0) {
-    LOG4CXX_WARN(logger_, "Unable to write into BIO");
+    LOG4CXX_WARN(logger_, "Unable to write into BIO," << "BIO_new_mem_buf:" << cert_data.length() << ",BIO_read:" << len << ",BIO_write:" << k);
     return false;
   }
-
+  LOG4CXX_INFO(logger_, "BIO_new_mem_buf:" << cert_data.length() << ",BIO_read:" << len << ",BIO_write:" << k);
   PKCS12* p12 = d2i_PKCS12_bio(bio_cert, NULL);
-  if(NULL == p12) {
+  if(NULL == p12 || NULL == p12->mac) {
     LOG4CXX_ERROR(logger_, "Unable to parse certificate");
     return false;
   }
@@ -330,7 +342,7 @@ bool CryptoManagerImpl::set_certificate(const std::string &cert_data) {
   PKCS12_parse(p12, NULL, &pkey, &cert, NULL);
 
   if (NULL == cert || NULL == pkey){
-    LOG4CXX_WARN(logger_, "Either certificate or key not valid.");
+    LOG4CXX_WARN(logger_, "Either certificate or key not valid:certificate is " << (cert ? "not null":"null")<<", key is "<<(pkey?"not null":"null"));
     return false;
   }
 
@@ -338,7 +350,6 @@ bool CryptoManagerImpl::set_certificate(const std::string &cert_data) {
     LOG4CXX_WARN(logger_, "Could not use certificate");
     return false;
   }
-
   asn1_time_to_tm(X509_get_notAfter(cert));
 
   if (!SSL_CTX_use_PrivateKey(context_, pkey)) {
@@ -368,7 +379,6 @@ void CryptoManagerImpl::asn1_time_to_tm(ASN1_TIME *time) {
   } else {
     expiration_time_.tm_year = year < 50 ? year + 100 : year;
   }
-
   const int mon = pull_number_from_buf(buf, &index);
   const int day = pull_number_from_buf(buf, &index);
   const int hour = pull_number_from_buf(buf, &index);

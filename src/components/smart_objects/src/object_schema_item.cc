@@ -70,7 +70,7 @@ Errors::eType CObjectSchemaItem::validate(const SmartObject& object) {
     const std::string& key = it->first;
     const SMember& member = it->second;
 
-    std::set<std::string>::const_iterator key_it = object_keys.find(key);
+    std::set<std::string>::iterator key_it = object_keys.find(key);
     if (object_keys.end() == key_it) {
       if (member.mIsMandatory) {
         return Errors::MISSING_MANDATORY_PARAMETER;
@@ -82,7 +82,7 @@ Errors::eType CObjectSchemaItem::validate(const SmartObject& object) {
     if (Errors::OK != result) {
       return result;
     }
-    object_keys.erase(key_it);
+	object_keys.erase(key_it);
   }
   return Errors::OK;
 }

@@ -236,6 +236,8 @@ void SecurityManagerImpl::NotifyListenersOnHandshakeDone(
     const uint32_t &connection_key,
     SSLContext::HandshakeResult error) {
   LOG4CXX_AUTO_TRACE(logger_);
+  if (listeners_.empty())
+    return;
   std::list<SecurityManagerListener*>::iterator it = listeners_.begin();
   while (it != listeners_.end()) {
     if ((*it)->OnHandshakeDone(connection_key, error)) {

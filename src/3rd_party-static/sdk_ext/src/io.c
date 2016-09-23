@@ -22,7 +22,9 @@
 #include <io.h>
 #include <stdio.h>
 #include <errno.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <fcntl.h>
 
 int _wcelocking (int _FileHandle, int _LockMode, long _NumOfBytes)

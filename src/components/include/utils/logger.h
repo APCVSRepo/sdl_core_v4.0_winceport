@@ -127,11 +127,15 @@
     #define CREATE_LOGGERPTR_GLOBAL(logger_var, logger_name)
 
     #define CREATE_LOGGERPTR_LOCAL(logger_var, logger_name)
+    
+    #define ENABLE_LOGGER(logs_enabled)   
 
     #define INIT_LOGGER(file_name)
 
-    #define DEINIT_LOGGER(file_name)
-
+    #define DEINIT_LOGGER()
+    
+    #undef FLUSH_LOGGER
+    #define FLUSH_LOGGER()
     #define LOG4CXX_IS_TRACE_ENABLED(logger) false
 
     #undef LOG4CXX_TRACE

@@ -40,6 +40,7 @@
 #include <string.h>
 #include "utils/logger.h"
 #include "utils/macro.h"
+#include <vector>
 
 #ifdef OS_WINCE
 #include "utils/global.h"

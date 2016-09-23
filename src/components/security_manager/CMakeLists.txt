@@ -27,10 +27,13 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
- 
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  find_package(WinOpenSSL REQUIRED)
+endif()
 
 include_directories(
-  include/
+  ${COMPONENTS_DIR}/security_manager/include/
   ${COMPONENTS_DIR}/protocol_handler/include/
   ${COMPONENTS_DIR}/connection_handler/include
   ${COMPONENTS_DIR}/config_profile/include/
@@ -40,6 +43,7 @@ include_directories(
   ${COMPONENTS_DIR}/resumption/include
   ${CMAKE_SOURCE_DIR}/src/3rd_party-static/jsoncpp/include
   ${APR_INCLUDE_DIRECTORY}
+   ${OPENSSL_INCLUDE_DIRECTORY}
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
@@ -61,11 +65,17 @@ set (SOURCES
   ${COMPONENTS_DIR}/security_manager/src/crypto_manager_impl.cc
   ${COMPONENTS_DIR}/security_manager/src/ssl_context_impl.cc
 )
-
-add_library(SecurityManager ${SOURCES})
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
-  target_link_libraries(SecurityManager ssleay32 libeay32 ProtocolHandler jsoncpp ProtocolLibrary)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
+    file (GLOB inc ${COMPONENTS_DIR}/security_manager/include/security_manager/*.h)
+    string( REPLACE / \\ group ${inc} )
+    source_group("Header Files" FILES ${inc} )
+    add_library("SecurityManager" ${inc} ${SOURCES})
+    target_link_libraries(SecurityManager libeay32 ssleay32  ProtocolHandler jsoncpp ProtocolLibrary)
+    if(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
+     target_link_libraries(SecurityManager wcecompat wcecompatex)
+    endif()
 else()
+  add_library(SecurityManager ${SOURCES})
   target_link_libraries(SecurityManager crypto ssl ProtocolHandler jsoncpp ProtocolLibrary)
 endif()
 if(BUILD_TESTS)

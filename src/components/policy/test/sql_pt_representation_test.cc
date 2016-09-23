@@ -1030,7 +1030,7 @@ TEST(SQLPTRepresentationTest3,
   ON_CALL(policy_settings_, app_storage_folder())
       .WillByDefault(ReturnRef(kAppStorageFolder));
   SQLPTRepresentation reps;
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
   EXPECT_TRUE(file_system::DeleteFileWindows("policy.sqlite")); // Delete policy.sqlite left by other ut case.
 #endif
   EXPECT_EQ(::policy::SUCCESS, reps.Init(&policy_settings_));

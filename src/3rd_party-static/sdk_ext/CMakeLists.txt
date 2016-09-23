@@ -6,6 +6,7 @@ include_directories (
 )
 
 set (SDK_WINCE_SOURCES
+  ./src/errno_ext.cpp
   ./src/time_ext.c
   ./src/timeb.cpp
   ./src/process.c
@@ -16,6 +17,7 @@ set (SDK_WINCE_SOURCES
   ./src/ChildData.cpp
   ./src/conio.c
   ./src/stat.cpp
+  ./src/string_extras.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:wchar_t-")

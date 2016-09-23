@@ -71,6 +71,8 @@ endif()
 
 create_test("media_manager_test" "${SOURCES}" "${LIBRARIES}")
 
+add_dependencies(media_manager_test MessageHelper)
+
 if(ENABLE_LOG)
     target_link_libraries("media_manager_test" log4cxx -L${LOG4CXX_LIBS_DIRECTORY})
 endif()

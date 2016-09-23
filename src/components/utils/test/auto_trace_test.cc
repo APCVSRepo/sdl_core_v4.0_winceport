@@ -117,6 +117,7 @@ TEST(AutoTraceTest, AutoTrace_WriteToFile_ReadCorrectString) {
   Preconditions();
   InitLogger();
   CreateDeleteAutoTrace(testlog);
+  DEINIT_LOGGER();
   const TimevalStruct startTime = date_time::DateTime::getCurrentTime();
   const int64_t timeout_msec = 10000;
   // Waiting for empty Logger MessageQueue 10 seconds

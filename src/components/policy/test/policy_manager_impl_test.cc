@@ -122,7 +122,6 @@ class PolicyManagerImplTest : public ::testing::Test {
 
   void TearDown() OVERRIDE {
     delete cache_manager;
-    delete manager;
   }
 
   ::testing::AssertionResult IsValid(const policy_table::Table& table) {
@@ -501,8 +500,8 @@ TEST_F(PolicyManagerImplTest2, IsAppRevoked_SetRevokedAppID_ExpectAppRevoked) {
   ifile.close();
 
   ::policy::BinaryMessage msg(json.begin(), json.end());
-  ASSERT_FALSE(manager->LoadPT("file_pt_update.json", msg)); // IsPTValid return false because app_policies[app_id1] is null, so LoadPT should return false as expect.
-  EXPECT_FALSE(manager->IsApplicationRevoked(app_id1));
+  ASSERT_TRUE(manager->LoadPT("file_pt_update.json", msg));
+  EXPECT_TRUE(manager->IsApplicationRevoked(app_id1));
 }
 
 TEST_F(PolicyManagerImplTest, IncrementGlobalCounter) {
@@ -632,18 +631,12 @@ TEST_F(
     PolicyManagerImplTest2,
     AddApplication_AddExistingApplicationFromDeviceWithoutConsent_ExpectNoUpdateRequired) {
   // Arrange
-		printf("CreateLocalPT\n");
   CreateLocalPT("sdl_preloaded_pt.json");
-  printf("1\n");
   EXPECT_EQ("UP_TO_DATE", manager->GetPolicyTableStatus());
-   printf("2\n");
   GetPTU("valid_sdl_pt_update.json");
-   printf("3\n");
   EXPECT_EQ("UP_TO_DATE", manager->GetPolicyTableStatus());
   // Try to add existing app
-   printf("4\n");
   manager->AddApplication(app_id2);
-   printf("5\n");
   // Check no update required
   EXPECT_EQ("UP_TO_DATE", manager->GetPolicyTableStatus());
 }

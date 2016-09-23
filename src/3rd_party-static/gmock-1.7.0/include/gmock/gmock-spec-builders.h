@@ -65,7 +65,9 @@
 #elif defined(OS_WIN32)
 #include <winsock.h>
 #elif defined(OS_WINCE)
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #endif
 
 #include <map>

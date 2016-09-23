@@ -22,7 +22,9 @@
 #include <time_ext.h>
 #include "sys/timeb.h"
 #include <stdio.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <errno.h>
 #ifdef OS_WINCE
 #include "errno_ext.h"

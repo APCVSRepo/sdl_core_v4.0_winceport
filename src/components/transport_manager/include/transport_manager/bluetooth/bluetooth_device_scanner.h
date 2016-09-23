@@ -44,7 +44,9 @@
 #elif defined(OS_WINCE)
 #include <objbase.h>
 #include <initguid.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <ws2bth.h>
 #include <map>
 #else

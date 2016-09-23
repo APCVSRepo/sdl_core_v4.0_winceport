@@ -1146,10 +1146,6 @@ bool CacheManager::SetPredataPolicy(const std::string &app_id) {
   return true;
 }
 
-static bool Compare(const std::string &v1,const std::string &v2) {
-  return v1 < v2;
-}
-
 bool CacheManager::IsPredataPolicy(const std::string &app_id) {
   // TODO(AOleynik): Maybe change for comparison with pre_DataConsent
   // permissions or check string value from get_string()
@@ -1158,11 +1154,9 @@ bool CacheManager::IsPredataPolicy(const std::string &app_id) {
   policy_table::ApplicationParams& specific_app =
     pt_->policy_table.app_policies_section.apps[app_id];
   //order the table
-  std::sort(pre_data_app.groups.begin(), pre_data_app.groups.end(), Compare);
-  std::sort(specific_app.groups.begin(), specific_app.groups.end(), Compare);
-  policy_table::Strings res;
   std::sort(pre_data_app.groups.begin(), pre_data_app.groups.end());
   std::sort(specific_app.groups.begin(), specific_app.groups.end());
+  policy_table::Strings res;
   std::set_intersection(pre_data_app.groups.begin(),
                         pre_data_app.groups.end(),
                         specific_app.groups.begin(),

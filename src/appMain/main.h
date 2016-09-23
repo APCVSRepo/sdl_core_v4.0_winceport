@@ -4,7 +4,7 @@
 #include "build_target_lib.h"
 
 #ifdef BUILD_TARGET_LIB
-# ifdef OS_WIN32
+# if defined(OS_WIN32) || defined(OS_WINCE)
 #  define BUILD_DLL_EXPORT __declspec(dllexport)
 #  define BUILD_DLL_EXPORT_C 
 # else
@@ -12,7 +12,7 @@
 #  define BUILD_DLL_EXPORT_C 
 # endif
 #else 
-# ifdef OS_WIN32
+# if defined(OS_WIN32) || defined(OS_WINCE)
 #  define BUILD_DLL_EXPORT __declspec(dllimport)
 #  define BUILD_DLL_EXPORT_C extern "C" 
 # else

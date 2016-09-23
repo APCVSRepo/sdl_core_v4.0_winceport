@@ -71,9 +71,11 @@ set(default_sources
     ${COMPONENTS_DIR}/media_manager/src/audio/file_audio_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/video/socket_video_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/video/file_video_streamer_adapter.cc
+	${COMPONENTS_DIR}/media_manager/src/video/callback_video_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/socket_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/file_streamer_adapter.cc
+	${COMPONENTS_DIR}/media_manager/src/callback_streamer_adapter.cc
 )
 else()
 set(default_sources
@@ -83,10 +85,12 @@ set(default_sources
     ${COMPONENTS_DIR}/media_manager/src/video/socket_video_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/video/pipe_video_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/video/file_video_streamer_adapter.cc
+	${COMPONENTS_DIR}/media_manager/src/video/callback_video_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/pipe_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/socket_streamer_adapter.cc
     ${COMPONENTS_DIR}/media_manager/src/file_streamer_adapter.cc
+	${COMPONENTS_DIR}/media_manager/src/callback_streamer_adapter.cc
 )
 endif()
 set(LIBRARIES

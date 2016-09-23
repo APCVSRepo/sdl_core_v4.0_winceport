@@ -30,36 +30,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SRC_COMPONENTS_MEDIA_MANAGER_INCLUDE_MEDIA_MANAGER_CALLBACK_STREAMER_ADAPTER_H_
-#define SRC_COMPONENTS_MEDIA_MANAGER_INCLUDE_MEDIA_MANAGER_CALLBACK_STREAMER_ADAPTER_H_
-
-#include <string>
-#include "media_manager/streamer_adapter.h"
-#include "utils/threads/thread_delegate.h"
+#include "media_manager/video/callback_video_streamer_adapter.h"
 
 namespace media_manager {
 
-class CallbackStreamerAdapter : public StreamerAdapter {
- public:
-  CallbackStreamerAdapter();
-  virtual ~CallbackStreamerAdapter();
+CallbackVideoStreamerAdapter::CallbackVideoStreamerAdapter() {
 
- protected:
-  class CallbackStreamer : public StreamerAdapter::Streamer {
-   public:
-    CallbackStreamer(CallbackStreamerAdapter* const adapter);
-    virtual ~CallbackStreamer();
+}
 
-   protected:
-    virtual bool Connect();
-    virtual void Disconnect();
-    virtual bool Send(protocol_handler::RawMessagePtr msg);
+CallbackVideoStreamerAdapter::~CallbackVideoStreamerAdapter() {
 
-   private:
+}
 
-  };
-};
-
-}  //  namespace media_manager
-
-#endif  // SRC_COMPONENTS_MEDIA_MANAGER_INCLUDE_MEDIA_MANAGER_CALLBACK_STREAMER_ADAPTER_H_
+}  // namespace media_manager

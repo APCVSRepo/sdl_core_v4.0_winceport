@@ -76,7 +76,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
   if (pt1 && pt2) {
     return pt1->thread == pt2->thread;
   } else {
-    return 0;
+    return !pt1 && !pt2;
   }
 #else
   result = ( t1.p == t2.p && t1.x == t2.x );

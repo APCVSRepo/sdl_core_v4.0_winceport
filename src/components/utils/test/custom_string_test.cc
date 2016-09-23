@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include "gtest/gtest.h"
 #include "custom_string.h"
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
 #include "utils/global.h"
 #include <windows.h>
 #endif
@@ -332,8 +332,31 @@ TEST_F(
                      0xD1,
                      0x81,
                      0xD0,
-                     0xA2};  // String contains russian word "тесТ"
+                     0xA2 };  // Array contains russian word "тесТ"
   std::string mbstring = CreateMultibyteString(array, kSizeStr);
+#if defined(OS_WIN32)
+  if (Global::isUnicode(mbstring.c_str(), mbstring.size())) {
+    std::string tmp;
+    Global::fromUnicode((wchar_t*)mbstring.c_str(), CP_ACP, tmp);
+    mbstring = tmp;
+  }
+  else if(Global::isUtf8(mbstring.c_str(), mbstring.size())) {
+    std::string tmp;
+    Global::utf8MultiToAnsiMulti(mbstring, tmp);
+    mbstring = tmp;
+  }
+
+  if (Global::isUnicode(mbstring1_.c_str(), mbstring1_.size())) {
+    std::string tmp;
+    Global::fromUnicode((wchar_t*)mbstring1_.c_str(), CP_ACP, tmp);
+    mbstring1_ = tmp;
+  }
+  else if (Global::isUtf8(mbstring1_.c_str(), mbstring1_.size())) {
+    std::string tmp;
+    Global::utf8MultiToAnsiMulti(mbstring1_, tmp);
+    mbstring1_ = tmp;
+  }
+#endif
   custom_str::CustomString obj(CustomStringTest::mbstring1_);
   custom_str::CustomString obj1(mbstring);
   EXPECT_TRUE(obj.CompareIgnoreCase(obj1));

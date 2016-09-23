@@ -45,7 +45,7 @@ namespace {
 
 sync_primitives::Lock test_lock;
 sync_primitives::ConditionalVariable lock_monitor;
-const uint32_t kDefaultTimeout = 30u;
+const uint32_t kDefaultTimeout = 3u;
 const std::string kTimerName = "test_timer";
 
 class TestTask : public timer::TimerTask {
@@ -122,18 +122,18 @@ TEST_F(TimerTest, Start_ZeroTimeout_CorrectTimeout) {
 }
 
 TEST_F(TimerTest, Start_NoLoop_OneCall) {
-  //// Preconditions
-  //test_lock.Acquire();
-  //TestTask* task = new TestTask();
-  //timer::Timer test_timer(kTimerName, task);
-  //// Actions
-  //test_timer.Start(timeout_, single_shot_);
-  //ASSERT_TRUE(test_timer.is_running());
-  //// Wait for call
-  //lock_monitor.Wait(test_lock);
-  //test_lock.Release();
-  //EXPECT_FALSE(test_timer.is_running());
-  //EXPECT_EQ(1u, task->GetCallsCount());
+  // Preconditions
+  test_lock.Acquire();
+  TestTask* task = new TestTask();
+  timer::Timer test_timer(kTimerName, task);
+  // Actions
+  test_timer.Start(timeout_, single_shot_);
+  ASSERT_TRUE(test_timer.is_running());
+  // Wait for call
+  lock_monitor.Wait(test_lock);
+  test_lock.Release();
+  EXPECT_FALSE(test_timer.is_running());
+  EXPECT_EQ(1u, task->GetCallsCount());
 }
 
 TEST_F(TimerTest, Start_Loop_3Calls) {
@@ -144,8 +144,9 @@ TEST_F(TimerTest, Start_Loop_3Calls) {
   TestTask* task = new TestTask();
   timer::Timer test_timer(kTimerName, task);
   // Actions
+  timeout_ = 1000u;
   test_timer.Start(timeout_, single_shot_);
-  for (uint32_t i = loops_count; i; --i) {
+  for (uint32_t i = 0; i < loops_count; i++) {
     lock_monitor.Wait(test_lock);
   }
   test_lock.Release();

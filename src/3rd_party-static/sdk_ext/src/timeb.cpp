@@ -18,8 +18,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <sys/timeb.h>
 
 int   timezone, _timezone, altzone;

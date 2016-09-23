@@ -212,7 +212,7 @@ void ConnectionHandlerImpl::OnConnectionFailed(
 }
 
 void ConnectionHandlerImpl::OnConnectionClosed(
-    transport_manager::ConnectionUID connection_id) {
+    const transport_manager::ConnectionUID connection_id) {
   LOG4CXX_AUTO_TRACE(logger_);
 
   OnConnectionEnded(connection_id);

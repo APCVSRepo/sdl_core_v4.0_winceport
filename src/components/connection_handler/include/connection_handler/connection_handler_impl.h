@@ -138,12 +138,12 @@ class ConnectionHandlerImpl : public ConnectionHandler,
     const transport_manager::DeviceInfo &device_info,
     const transport_manager::ConnectError &error) OVERRIDE;
   void OnConnectionClosed(
-    transport_manager::ConnectionUID connection_id) OVERRIDE;
+    const transport_manager::ConnectionUID connection_id) OVERRIDE;
   void OnConnectionClosedFailure(
-    transport_manager::ConnectionUID connection_id,
+    const transport_manager::ConnectionUID connection_id,
     const transport_manager::DisconnectError &error) OVERRIDE;
   void OnUnexpectedDisconnect(
-    transport_manager::ConnectionUID connection_id,
+    const transport_manager::ConnectionUID connection_id,
     const transport_manager::CommunicationError &error) OVERRIDE;
   void OnDeviceConnectionLost(
     const connection_handler::DeviceHandle &device,

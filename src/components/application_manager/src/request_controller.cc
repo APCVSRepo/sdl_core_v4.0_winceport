@@ -380,13 +380,11 @@ void RequestController::onTimer() {
       continue;
     }
     if (!probably_expired->isExpired()) {
-      LOG4CXX_INFO(logger_, "onTimer:isExpired");
       sync_primitives::AutoLock auto_lock(timer_lock);
       const TimevalStruct current_time = date_time::DateTime::getCurrentTime();
       const TimevalStruct end_time = probably_expired->end_time();
       if (current_time < end_time) {
         const uint32_t msecs = static_cast<uint32_t>(date_time::DateTime::getmSecs(end_time - current_time));
-        LOG4CXX_DEBUG(logger_, "Sleep for " << msecs << " millisecs");
         timer_condition_.WaitFor(auto_lock, msecs);
       }
       continue;
@@ -497,6 +495,7 @@ void RequestController::Worker::exitThreadMain() {
 
 void RequestController::UpdateTimer() {
   LOG4CXX_TRACE(logger_,"UpdateTimer");
+  sync_primitives::AutoLock auto_lock(timer_lock);
   timer_condition_.NotifyOne();
 }
 

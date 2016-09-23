@@ -49,7 +49,7 @@
 using ::testing::Return;
 using ::testing::ReturnRef;
 using ::testing::NiceMock;
-
+#include <stdlib.h>
 namespace {
 const size_t kUpdatesBeforeHour = 24;
 const std::string kCaPath = "";
@@ -63,9 +63,9 @@ const std::string kFordCipher = SSL3_TXT_RSA_DES_192_CBC3_SHA;
 #else
 // Used cipher from ford protocol requirement
 #ifdef OS_WINCE
-const std::string kFordCipher = TLS1_TXT_RSA_WITH_AES_256_SHA;
+const std::string kFordCipher =TLS1_TXT_RSA_WITH_AES_256_SHA;
 #else
-const std::string kFordCipher = "TLS1_TXT_RSA_WITH_AES_256_GCM_SHA384";
+const std::string kFordCipher = TLS1_TXT_RSA_WITH_AES_256_SHA;
 #endif
 #endif
 }  // namespace
@@ -127,7 +127,7 @@ class SSLTest : public testing::Test {
     EXPECT_CALL(*mock_crypto_manager_settings_, ca_cert_path())
         .WillRepeatedly(ReturnRef(kCaPath));
     EXPECT_CALL(*mock_crypto_manager_settings_, verify_peer())
-        .WillOnce(Return(false));
+        .WillRepeatedly(Return(false));
     const bool crypto_manager_initialization = crypto_manager_->Init();
     EXPECT_TRUE(crypto_manager_initialization);
 
@@ -138,19 +138,17 @@ class SSLTest : public testing::Test {
     client_manager_ = new security_manager::CryptoManagerImpl(client_crypto);
 
     EXPECT_CALL(*mock_client_manager_settings_, security_manager_mode())
-        .WillOnce(Return(security_manager::CLIENT));
-    EXPECT_CALL(*mock_client_manager_settings_,
-                security_manager_protocol_name())
-        .WillOnce(Return(security_manager::TLSv1_2));
+        .WillRepeatedly(Return(security_manager::CLIENT));
+    EXPECT_CALL(*mock_client_manager_settings_,security_manager_protocol_name())
+        .WillRepeatedly(Return(security_manager::TLSv1_2));
     EXPECT_CALL(*mock_client_manager_settings_, certificate_data())
         .WillOnce(ReturnRef(certificate_data_base64_));
     EXPECT_CALL(*mock_client_manager_settings_, ciphers_list())
         .WillRepeatedly(ReturnRef(kAllCiphers));
     EXPECT_CALL(*mock_client_manager_settings_, ca_cert_path())
-        .Times(2)
         .WillRepeatedly(ReturnRef(kCaPath));
     EXPECT_CALL(*mock_client_manager_settings_, verify_peer())
-        .WillOnce(Return(false));
+        .WillRepeatedly(Return(false));
     const bool client_manager_initialization = client_manager_->Init();
     EXPECT_TRUE(client_manager_initialization);
 
@@ -162,7 +160,6 @@ class SSLTest : public testing::Test {
         .WillRepeatedly(Return(security_manager::SERVER));
     server_ctx = crypto_manager_->CreateSSLContext();
     EXPECT_CALL(*mock_client_manager_settings_, security_manager_mode())
-        .Times(2)
         .WillRepeatedly(Return(security_manager::CLIENT));
     client_ctx = client_manager_->CreateSSLContext();
 
@@ -207,9 +204,9 @@ class SSLTestParam : public testing::TestWithParam<ProtocolAndCipher> {
  protected:
   virtual void SetUp() OVERRIDE {
 #ifdef OS_WINCE
-    std::ifstream certificate_file(Global::RelativePathToAbsPath("server/spt_credential.p12").c_str());
+    std::ifstream certificate_file(Global::RelativePathToAbsPath("server/spt_credential.p12").c_str(),std::ios_base::binary);
 #else
-    std::ifstream certificate_file("server/spt_credential.p12");
+    std::ifstream certificate_file("server/spt_credential.p12",std::ios_base::binary);
 #endif
     ASSERT_TRUE(certificate_file.is_open())
         << "Could not open certificate data file";
@@ -378,7 +375,7 @@ TEST_F(SSLTest, OnTSL2Protocol_BrokenHandshake) {
   ASSERT_FALSE(NULL == kClientBuf);
   ASSERT_LT(0u, client_buf_len);
   // Broke 3 bytes for get abnormal fail of handshake
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
 #else
   const_cast<uint8_t*>(kClientBuf)[0] ^= 0xFF;
   const_cast<uint8_t*>(kClientBuf)[client_buf_len / 2] ^= 0xFF;
@@ -503,11 +500,11 @@ TEST_F(SSLTest, DISABLED_OnTSL2Protocol_EcncryptionFail) {
 }
 
 TEST_P(SSLTestParam, ClientAndServerNotTLSv1_2_HandshakeFailed) {
-  ASSERT_EQ(security_manager::SSLContext::Handshake_Result_AbnormalFail,
-            client_ctx->StartHandshake(&kClientBuf, &client_buf_len));
-  EXPECT_TRUE(NULL == kClientBuf);
-  EXPECT_EQ(0u, client_buf_len);
   ASSERT_EQ(security_manager::SSLContext::Handshake_Result_Success,
+            client_ctx->StartHandshake(&kClientBuf, &client_buf_len));
+  EXPECT_FALSE(NULL == kClientBuf);
+  EXPECT_LT(0u, client_buf_len);
+  ASSERT_EQ(security_manager::SSLContext::Handshake_Result_AbnormalFail,
             server_ctx->DoHandshakeStep(
                 kClientBuf, client_buf_len, &kServerBuf, &server_buf_len));
   EXPECT_TRUE(NULL == kServerBuf);

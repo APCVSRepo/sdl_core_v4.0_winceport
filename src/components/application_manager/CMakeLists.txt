@@ -413,6 +413,8 @@ target_link_libraries("ApplicationManager" ${LIBRARIES} AMHMICommandsLibrary
                                                         AMEventEngine
                                                         AMPolicyLibrary)
 
+add_dependencies(MessageHelper HMI_API)
+
 if(ENABLE_LOG)
   target_link_libraries("ApplicationManager" log4cxx -L${LOG4CXX_LIBS_DIRECTORY})
 endif()

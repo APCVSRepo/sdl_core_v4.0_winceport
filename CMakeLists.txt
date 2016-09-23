@@ -41,13 +41,15 @@ option(BUILD_SHARED_LIBS "Build all libraries as shared (if ON) or static (if OF
 option(BUILD_BT_SUPPORT "Bluetooth support" ON)
 option(BUILD_USB_SUPPORT "libusb support" ON)
 option(BUILD_BACKTRACE_SUPPORT "backtrace support" ON)
-option(BUILD_TESTS "Possibility to build and run tests" OFF)
+option(BUILD_TESTS "Possibility to build and run tests" ON)
 option(TELEMETRY_MONITOR "Enable profiling time test util" OFF)
-option(ENABLE_LOG "Logging feature" OFF)
+option(ENABLE_LOG "Logging feature" ON)
 option(ENABLE_GCOV "gcov code coverage feature" OFF)
 option(ENABLE_SANITIZE "Sanitize tool" OFF)
 option(ENABLE_SECURITY "Security Ford protocol protection" ON)
 option(ENABLE_HMI_PTU_DECRYPTION "Policy table update parsed by hmi" ON)
+
+option(BUILD_TARGET_LIBRARY    "build target as library" OFF)
 
 set(OS_TYPE_OPTION 	"$ENV{OS_TYPE}")
 set(DEBUG_OPTION 	"$ENV{DEBUG}")
@@ -233,7 +235,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set (BUILD_BT_SUPPORT OFF)
   set (EXTENDED_MEDIA_MODE OFF)
   set (BUILD_BACKTRACE_SUPPORT OFF)
-  set (ENABLE_LOG ON)
   set (ENABLE_SECURITY ON)
   add_definitions(-DLOG4CXX_STATIC)
   add_definitions(-DAPR_DECLARE_STATIC)
@@ -256,8 +257,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
   add_definitions(-DLOG4CXX_STATIC)
   add_definitions(-DAPR_DECLARE_STATIC)
   add_definitions(-DMODIFY_FUNCTION_SIGN)
-  set (ENABLE_LOG ON)
-  set (ENABLE_SECURITY ON)
   set (BUILD_BT_SUPPORT OFF)
   set (BUILD_USB_SUPPORT ON)
   set (BUILD_AVAHI_SUPPORT OFF)
@@ -265,6 +264,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
   set (EXTENDED_MEDIA_MODE OFF)
 endif()
 
+if(BUILD_TARGET_LIBRARY)
+add_definitions(-DBUILD_TARGET_LIB)
+endif()
 
 if (BUILD_USB_SUPPORT)
   add_definitions(-DUSB_SUPPORT)
@@ -419,6 +421,10 @@ endif()
 
 
 # Include direction and link library
+
+include_directories (
+${CMAKE_SOURCE_DIR}/include/all
+)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   include_directories (
     ${CMAKE_SOURCE_DIR}/include/win32

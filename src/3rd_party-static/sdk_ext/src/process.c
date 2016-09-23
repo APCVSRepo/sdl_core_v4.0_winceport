@@ -20,7 +20,9 @@
 
 
 #include <process.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 
 int _getpid(void)
 {

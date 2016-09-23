@@ -52,7 +52,7 @@ namespace policy {
 TEST(SharedLibraryTest, FullTest_OpenLibrarySetSymbolCloseLibrary_ExpectActsWithoutErrors) {
 #if defined(OS_WIN32)
     //Arrange
-    const std::string kLib = "..\\src\\policy\\Policy.dll";
+    const std::string kLib = "Policy.dll";
     HINSTANCE handle = LoadLibrary(kLib.c_str());
 
     //Assert

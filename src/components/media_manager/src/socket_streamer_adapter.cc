@@ -38,7 +38,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #else
-#include <WinSock2.h>
+#ifndef _WINSOCKAPI_
+#include <winsock2.h>
+#endif
 #include <ws2tcpip.h>
 #ifndef close
 #define close closesocket

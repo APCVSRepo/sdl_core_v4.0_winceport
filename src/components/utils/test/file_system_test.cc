@@ -1580,7 +1580,11 @@ TEST(FileSystemTest,
   CreateDirectoryRecursively(rel_path[1]);
 
   // Get absolute parrent dir
+#if defined(OS_WIN32) || defined(OS_WINCE)
+  const std::string& absolute_parrent_dir = GetAbsolutePath("..\\");
+#else
   const std::string& absolute_parrent_dir = GetAbsolutePath("../");
+#endif
   // Check
   for (size_t i = 0; i < rel_path.size(); ++i) {
     // Concatenation rel_path to current dir path

@@ -22,8 +22,9 @@
 #ifndef __wcecompat__ARGS_H__
 #define __wcecompat__ARGS_H__
 
-
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 
 
 // generate argc/argv from program name and lpCmdLine

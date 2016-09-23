@@ -129,9 +129,18 @@ bool System::Execute(bool wait) {
   PROCESS_INFORMATION pi;
   STARTUPINFO si = { sizeof(si) };
 
+  if (!wait && command_.empty()) {
+    return true;
+  }
+
+  std::string cmdLine = command_;
+  for (int32_t i = 0; i < argv_.size(); i++) {
+    cmdLine += std::string(" ") + argv_[i];
+  }
+
   bRet = CreateProcess(
       NULL,
-      (LPSTR)command_.c_str(),
+      (LPSTR)cmdLine.c_str(),
       NULL,
       NULL,
       FALSE,   

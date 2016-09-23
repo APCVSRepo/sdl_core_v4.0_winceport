@@ -19,7 +19,9 @@
  */
 
 
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <stdio.h>
 #include <tchar.h>
 #include "pipe.h"

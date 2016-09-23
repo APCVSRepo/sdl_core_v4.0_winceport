@@ -118,6 +118,8 @@ class MessageLoopThread {
     Handler& handler_;
     // Message queue that is actually owned by MessageLoopThread
     MessageQueue<Message, Queue>& message_queue_;
+
+    sync_primitives::Lock  message_lock_;
   };
 
  private:
@@ -183,8 +185,10 @@ template<class Q>
 void MessageLoopThread<Q>::LoopThreadDelegate::threadMain() {
   CREATE_LOGGERPTR_LOCAL(logger_, "Utils")
   LOG4CXX_AUTO_TRACE(logger_);
+  sync_primitives::AutoLock auto_lock(message_lock_);
   while (!message_queue_.IsShuttingDown()) {
     DrainQue();
+    sync_primitives::AutoUnlock auto_lock(message_lock_);
     message_queue_.wait();
   }
   // Process leftover messages
@@ -193,6 +197,7 @@ void MessageLoopThread<Q>::LoopThreadDelegate::threadMain() {
 
 template<class Q>
 void MessageLoopThread<Q>::LoopThreadDelegate::exitThreadMain() {
+  sync_primitives::AutoLock auto_lock(message_lock_);
   message_queue_.Shutdown();
 }
 

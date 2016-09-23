@@ -197,6 +197,7 @@ APR_DECLARE(apr_status_t) apr_strftime(char *s, apr_size_t *retsize,
                                        apr_time_exp_t *xt)
 {
 #ifdef _WIN32_WCE
+    *retsize=0;
     return APR_ENOTIMPL;
 #else
     struct tm tm;

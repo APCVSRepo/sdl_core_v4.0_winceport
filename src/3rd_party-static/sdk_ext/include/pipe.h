@@ -22,8 +22,9 @@
 #ifndef __wcecompat__pipe_h__
 #define __wcecompat__pipe_h__
 
-
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 
 
 #ifdef __cplusplus

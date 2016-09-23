@@ -55,10 +55,10 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    *
    * @param Container that holds information about devices.
    */
-  void OnDeviceListUpdated(const std::vector<DeviceInfo>&) OVERRIDE {
+  virtual void OnDeviceListUpdated(const std::vector<DeviceInfo>&) OVERRIDE {
   }
 
-  void OnFindNewApplicationsRequest() OVERRIDE {
+  virtual void OnFindNewApplicationsRequest() OVERRIDE {
   }
 
   /**
@@ -66,17 +66,17 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    *
    * @param device_info Variable that hold information about device.
    */
-  void OnDeviceFound(const DeviceInfo& device_info) OVERRIDE {
+  virtual void OnDeviceFound(const DeviceInfo& device_info) OVERRIDE {
   }
-  void OnDeviceAdded(const DeviceInfo& device_info) OVERRIDE {
+  virtual void OnDeviceAdded(const DeviceInfo& device_info) OVERRIDE {
   }
-  void OnDeviceRemoved(const DeviceInfo& device_info) OVERRIDE {
+  virtual void OnDeviceRemoved(const DeviceInfo& device_info) OVERRIDE {
   }
 
   /**
    * @brief Reaction to the event, when scanning of devices is finished.
    */
-  void OnScanDevicesFinished() OVERRIDE {
+  virtual void OnScanDevicesFinished() OVERRIDE {
   }
 
   /**
@@ -84,7 +84,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    *
    * @param error Error information about possible reason of scanning of devices failure.
    */
-  void OnScanDevicesFailed(const SearchDeviceError& error) OVERRIDE {
+  virtual void OnScanDevicesFailed(const SearchDeviceError& error) OVERRIDE {
   }
 
   /**
@@ -93,7 +93,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param devcie_info Variable that hold information about device.
    * @param connection_id connection unique identifier.
    */
-  void OnConnectionEstablished(const DeviceInfo& device_info,
+  virtual void OnConnectionEstablished(const DeviceInfo& device_info,
                                        const ConnectionUID connection_id) OVERRIDE {
   }
 
@@ -103,7 +103,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param device_info Variable that hold information about device.
    * @param error Error information about possible reason of connect failure.
    */
-  void OnConnectionFailed(const DeviceInfo& device_info,
+  virtual void OnConnectionFailed(const DeviceInfo& device_info,
                                   const ConnectError& error) OVERRIDE {
   }
 
@@ -112,10 +112,10 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    *
    * @param connection_id Connection unique identifier.
    */
-  void OnConnectionClosed(ConnectionUID connection_id) OVERRIDE {
+  virtual void OnConnectionClosed(const ConnectionUID connection_id) OVERRIDE {
   }
 
-  void OnUnexpectedDisconnect(ConnectionUID connection_id,
+  virtual void OnUnexpectedDisconnect(const ConnectionUID connection_id,
                                       const CommunicationError& error) OVERRIDE {
   }
 
@@ -125,7 +125,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param connection_id Connection unique identifier.
    * @param error Error information about possible reason of failure.
    */
-  void OnConnectionClosedFailure(ConnectionUID connection_id,
+  virtual void OnConnectionClosedFailure(const ConnectionUID connection_id,
                                          const DisconnectError& error) OVERRIDE {
   }
 
@@ -135,7 +135,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param device Handle of device.
    * @param error Error information about possible reason of lost connection.
    */
-  void OnDeviceConnectionLost(const DeviceHandle& device,
+  virtual void OnDeviceConnectionLost(const DeviceHandle& device,
                                       const DisconnectDeviceError& error) OVERRIDE {
   }
 
@@ -145,7 +145,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param device Handle of device.
    * @param error Error information about possible reason of Disconnect failure.
    */
-  void OnDisconnectFailed(const DeviceHandle& device,
+  virtual void OnDisconnectFailed(const DeviceHandle& device,
                                   const DisconnectDeviceError& error) OVERRIDE {
   }
 
@@ -155,7 +155,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param message Smart pointer to the raw massage.
    * @param connection_id Connection unique identifier.
    */
-  void OnTMMessageReceived(const ::protocol_handler::RawMessagePtr message) OVERRIDE {
+  virtual void OnTMMessageReceived(const ::protocol_handler::RawMessagePtr message) OVERRIDE {
   }
 
   /**
@@ -164,13 +164,13 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param connection_id connection unique identifier.
    * @param error Error information about possible reason of failure.
    */
-  void OnTMMessageReceiveFailed(const DataReceiveError& error) OVERRIDE {
+  virtual void OnTMMessageReceiveFailed(const DataReceiveError& error) OVERRIDE {
   }
 
   /**
    * @brief Reaction to the event, when transport manager sent a massage.
    */
-  void OnTMMessageSend(const ::protocol_handler::RawMessagePtr message) OVERRIDE {
+  virtual void OnTMMessageSend(const ::protocol_handler::RawMessagePtr message) OVERRIDE {
   }
 
   /**
@@ -179,7 +179,7 @@ class TransportManagerListenerEmpty : public TransportManagerListener {
    * @param error Error information about possible reason of failure.
    * @param message Smart pointer to the raw massage.
    */
-  void OnTMMessageSendFailed(const DataSendError& error,
+  virtual void OnTMMessageSendFailed(const DataSendError& error,
                                      const ::protocol_handler::RawMessagePtr message) OVERRIDE {
   }
 };

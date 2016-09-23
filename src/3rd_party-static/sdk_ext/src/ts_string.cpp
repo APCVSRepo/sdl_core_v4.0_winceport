@@ -21,7 +21,9 @@
 
 #include "ts_string.h"
 #include <string.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 
 
 void ascii2unicode(const char* ascii, WCHAR* unicode)

@@ -33,7 +33,7 @@
 #include "sqlite_wrapper/sql_error.h"
 #include "sqlite_wrapper/sql_database.h"
 
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
 #include "utils/file_system.h"
 #endif
 
@@ -123,7 +123,7 @@ TEST(SQLDatabaseTest, OpenCloseFile_OpenAndCloseSpecifiedDB_ActsWithoutError) {
   //assert
   EXPECT_FALSE(IsError(db.LastError()));
 
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
   file_system::DeleteFileWindows("test-database.sqlite");
 #else
   remove("test-database.sqlite");
@@ -272,7 +272,7 @@ TEST(SQLDatabaseTest, IsReadWrite_FirstOpenDBIsRWSecondIsNot) {
   EXPECT_FALSE(db.IsReadWrite());
 
   db.Close();
-#ifdef OS_WINCE
+#if defined(OS_WIN32) || defined(OS_WINCE)
   file_system::DeleteFileWindows("test-database.sqlite");
 #else
   remove("test-database.sqlite");

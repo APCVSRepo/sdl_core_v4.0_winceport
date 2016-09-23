@@ -32,7 +32,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <stdio.h>
 #include <tchar.h>
 #include "ts_string.h"

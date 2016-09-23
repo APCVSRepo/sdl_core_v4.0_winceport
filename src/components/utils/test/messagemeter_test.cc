@@ -245,7 +245,7 @@ TEST_P(MessageMeterTest, CountingOutOfPeriod) {
 
   // sleep more than time range
 #if defined(OS_WIN32) || defined(OS_WINCE)
-  Sleep(time_range_msecs * usecs * 1.1);
+  Sleep(time_range_msecs * usecs / 1000 * 1.1);
 #else
   usleep(time_range_msecs * usecs * 1.1);
 #endif

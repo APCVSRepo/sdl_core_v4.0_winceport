@@ -126,6 +126,7 @@ TEST(AutoTraceTest, AutoTrace_WriteToFile_ReadCorrectString) {
         date_time::DateTime::getCurrentTime(), startTime), timeout_msec);
     threads::Thread::yield();
   }
+  DEINIT_LOGGER();
   ASSERT_TRUE(CheckAutoTraceDebugInFile(testlog));
 }
 

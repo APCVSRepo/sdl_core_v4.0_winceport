@@ -38,6 +38,7 @@
 #include <memory.h>
 #include <map>
 #include <algorithm>
+#include <iostream>
 
 #include "utils/macro.h"
 
@@ -223,7 +224,7 @@ bool CryptoManagerImpl::SSLContextImpl::ReadHandshakeData(
       *out_data_size = read_count;
       *out_data = buffer_;
     } else {
-      LOG4CXX_WARN(logger_, "BIO read fail");
+      LOG4CXX_WARN(logger_, "BIO read fail:"<<"pend="<<pend<<",read_count="<<read_count);
       is_handshake_pending_ = false;
       ResetConnection();
       return false;
@@ -238,7 +239,8 @@ bool CryptoManagerImpl::SSLContextImpl::WriteHandshakeData(
   LOG4CXX_AUTO_TRACE(logger_);
   if (in_data && in_data_size) {
     const int ret = BIO_write(bioIn_, in_data, in_data_size);
-    if (ret <= 0) {
+    if (ret <= 0||ret!=in_data_size) {
+      LOG4CXX_ERROR(logger_, "BIO_write,needed:" << in_data_size << ",actual:" << ret);
       is_handshake_pending_ = false;
       ResetConnection();
       return false;
@@ -249,6 +251,7 @@ bool CryptoManagerImpl::SSLContextImpl::WriteHandshakeData(
 
 SSLContext::HandshakeResult
 CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
+  
   const int handshake_result = SSL_do_handshake(connection_);
   if (handshake_result == 1) {
     const HandshakeResult result = CheckCertContext();
@@ -273,6 +276,7 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
     return Handshake_Result_Fail;
   } else {
     const int error = SSL_get_error(connection_, handshake_result);
+    LOG4CXX_DEBUG(logger_,"SSL_do_handshake:"<<error);
     if (error != SSL_ERROR_WANT_READ) {
       const long error = SSL_get_verify_result(connection_);
       SetHandshakeError(error);
@@ -280,8 +284,10 @@ CryptoManagerImpl::SSLContextImpl::PerformHandshake() {
                    "Handshake failed with error "
                        << " -> "
                        << SSL_get_error(connection_, error)
+                       << ",error:"
+                       <<error
                        << " \""
-                       << LastError()
+                       << ERR_reason_error_string(ERR_get_error())
                        << '"');
       ResetConnection();
       is_handshake_pending_ = false;
@@ -307,7 +313,6 @@ SSLContext::HandshakeResult CryptoManagerImpl::SSLContextImpl::DoHandshakeStep(
   DCHECK(out_data_size);
   *out_data = NULL;
   *out_data_size = 0;
-
   // TODO(Ezamakhov): add test - hanshake fail -> restart StartHandshake
   {
     sync_primitives::AutoLock locker(bio_locker);
@@ -353,6 +358,7 @@ bool CryptoManagerImpl::SSLContextImpl::Encrypt(const uint8_t* const in_data,
   const int read_size = BIO_read(bioOut_, buffer_, len);
   DCHECK(len == static_cast<size_t>(read_size));
   if (read_size <= 0) {
+    LOG4CXX_ERROR(logger_,"Encrypt error"<<SSL_get_error(connection_,read_size));
     // Reset filter and connection deinitilization instead
     BIO_ctrl(bioFilter_, BIO_CTRL_RESET, 0, NULL);
     return false;
@@ -385,6 +391,7 @@ bool CryptoManagerImpl::SSLContextImpl::Decrypt(const uint8_t* const in_data,
     len = BIO_read(bioFilter_, buffer_ + offset, len);
     // TODO(EZamakhov): investigate BIO_read return 0, -1 and -2 meanings
     if (len <= 0) {
+      LOG4CXX_ERROR(logger_, "Decrypt error" << SSL_get_error(connection_, len));
       // Reset filter and connection deinitilization instead
       BIO_ctrl(bioFilter_, BIO_CTRL_RESET, 0, NULL);
       return false;
@@ -444,14 +451,20 @@ void CryptoManagerImpl::SSLContextImpl::ResetConnection() {
   SSL_CTX* ssl_context = connection_->ctx;
   SSL_free(connection_);
   connection_ = SSL_new(ssl_context);
-  if (mode_ == SERVER) {
-    SSL_set_accept_state(connection_);
-  } else {
-    SSL_set_connect_state(connection_);
+  if (!connection_) {
+    LOG4CXX_ERROR(logger_,"SSL reset connection failed");
+    return;
   }
+  connection_->ctx=ssl_context;
   bioIn_ = BIO_new(BIO_s_mem());
   bioOut_ = BIO_new(BIO_s_mem());
   SSL_set_bio(connection_, bioIn_, bioOut_);
+  if (mode_ == SERVER) {
+    SSL_set_accept_state(connection_);
+  }
+  else {
+    SSL_set_connect_state(connection_);
+  }
 }
 
 void CryptoManagerImpl::SSLContextImpl::SetHandshakeContext(

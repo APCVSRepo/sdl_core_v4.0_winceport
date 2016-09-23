@@ -38,6 +38,9 @@
 #include "security_manager/mock_security_manager_settings.h"
 #include "utils/custom_string.h"
 
+#include "utils/global.h"
+#include "config_profile/profile.h"
+
 using ::testing::Return;
 using ::testing::ReturnRef;
 
@@ -54,14 +57,26 @@ namespace custom_str = utils::custom_string;
   } while (false)
 
 namespace {
-const std::string server_ca_cert_filename = "server";
-const std::string client_ca_cert_filename = "client";
-const std::string client_certificate = "client/client_credential.p12.enc";
-const std::string server_certificate = "server/spt_credential.p12.enc";
-const std::string server_unsigned_cert_file =
+#ifndef OS_WINCE
+  const std::string server_ca_cert_filename = "server";
+  const std::string client_ca_cert_filename = "client";
+  const std::string client_certificate = "client/client_credential.p12.enc";
+  const std::string server_certificate = "server/spt_credential.p12.enc";
+  const std::string server_unsigned_cert_file =
     "server/spt_credential_unsigned.p12.enc";
-const std::string server_expired_cert_file =
+  const std::string server_expired_cert_file =
     "server/spt_credential_expired.p12.enc";
+#else
+  const std::string server_ca_cert_filename =Global::RelativePathToAbsPath("server");
+  const std::string client_ca_cert_filename =Global::RelativePathToAbsPath("client");
+  const std::string client_certificate = Global::RelativePathToAbsPath("client/client_credential.p12.enc");
+  const std::string server_certificate = Global::RelativePathToAbsPath("server/spt_credential.p12.enc");
+  const std::string server_unsigned_cert_file =
+    Global::RelativePathToAbsPath("server/spt_credential_unsigned.p12.enc");
+  const std::string server_expired_cert_file =
+    Global::RelativePathToAbsPath("server/spt_credential_expired.p12.enc");
+#endif
+
 
 const bool verify_peer = true;
 const bool skip_peer_verification = false;
@@ -120,6 +135,9 @@ class SSLHandshakeTest : public testing::Test {
           .WillByDefault(ReturnRef(server_ca_certificate_path_));
       ON_CALL(*mock_server_manager_settings,verify_peer())
           .WillByDefault(Return(verify_peer));
+	  ON_CALL(*mock_server_manager_settings,update_before_hours())
+		  .WillByDefault(Return(updates_before_hour));
+      
   }
   void SetClientInitialValues(const security_manager::Protocol protocol,
                            const std::string certificate,
@@ -144,6 +162,8 @@ class SSLHandshakeTest : public testing::Test {
         .WillByDefault(ReturnRef(client_ca_certificate_path_));
     ON_CALL(*mock_client_manager_settings,verify_peer())
         .WillByDefault(Return(verify_peer));
+	ON_CALL(*mock_client_manager_settings,update_before_hours())
+		.WillByDefault(Return(updates_before_hour));
   }
 
   bool InitServerManagers(security_manager::Protocol protocol,
@@ -151,14 +171,14 @@ class SSLHandshakeTest : public testing::Test {
                           const std::string& ciphers_list,
                           const bool verify_peer,
                           const std::string& ca_certificate_path) {
-    std::ifstream cert(cert_filename.c_str());
+    std::ifstream cert(cert_filename.c_str(), std::ios_base::binary);
     std::stringstream ss;
     if (cert.is_open()){
       ss << cert.rdbuf();
     }
     cert.close();
     SetServerInitialValues(
-          protocol, ss.str(), ciphers_list, verify_peer, ca_certificate_path);
+      protocol, ss.str(), ciphers_list, verify_peer, ca_certificate_path);
     const bool initialized = server_manager->Init();
 
     if (!initialized) {
@@ -184,7 +204,7 @@ class SSLHandshakeTest : public testing::Test {
                           const std::string& ciphers_list,
                           const bool verify_peer,
                           const std::string& ca_certificate_path) {
-    std::ifstream cert(cert_filename.c_str());
+    std::ifstream cert(cert_filename.c_str(),std::ios_base::binary);
     std::stringstream certificate;
     if (cert.is_open()) {
       certificate << cert.rdbuf();

@@ -165,16 +165,12 @@ const SecurityQuery::QueryHeader &SecurityQuery::get_header() const {
 }
 
 const uint8_t* SecurityQuery::get_data() const {
-#ifdef OS_WINCE
   if (data_.size() == 0) {
     return NULL;
   }
   else {
     return &data_[0];
   }
-#else
-  return &data_[0];
-#endif
 }
 
 size_t SecurityQuery::get_data_size() const {

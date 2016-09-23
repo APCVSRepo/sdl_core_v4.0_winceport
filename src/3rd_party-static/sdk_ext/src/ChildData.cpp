@@ -21,7 +21,9 @@
 
 #include "ChildData.h"
 #include <stdlib.h>
+#ifndef _WINSOCKAPI_
 #include <winsock2.h>
+#endif
 #include <stdio.h>
 #include <tchar.h>
 #include "ts_string.h"

@@ -158,11 +158,21 @@ set (SOURCES
   signal_handlers.cc
 )
 
+if(BUILD_TARGET_LIBRARY)
+set (HEADERS
+  main.h
+)
+endif()
+
 if( NOT CMAKE_BUILD_TYPE )
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build. Options are: None, Debug, Release, RelWithDebInfo, MinSizeRel." FORCE)
 endif()
 
+if(BUILD_TARGET_LIBRARY)
+add_library(${PROJECT} SHARED ${HEADERS} ${SOURCES})
+else()
 add_executable(${PROJECT} ${SOURCES})
+endif()
 target_link_libraries(${PROJECT} ${LIBRARIES})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
@@ -236,7 +246,16 @@ if (${QT_HMI})
 endif ()
 
 # Install rules
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
+if(BUILD_TARGET_LIBRARY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLinkCore.dll" DESTINATION bin)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/Release/smartDeviceLinkCore.lib" DESTINATION bin)
+else()
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLinkCore.exe" DESTINATION bin)
+endif()
+else()
 install(TARGETS ${PROJECT} DESTINATION bin)
+endif()
 install(
   FILES log4cxx.properties audio.8bit.wav test.txt smartDeviceLink.ini
     hmi_capabilities.json sdl_preloaded_pt.json

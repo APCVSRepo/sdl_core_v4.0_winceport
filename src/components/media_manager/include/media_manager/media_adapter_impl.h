@@ -38,6 +38,13 @@
 #include "media_manager/media_adapter_listener.h"
 #include "utils/macro.h"
 
+#ifdef BUILD_TARGET_LIB
+#include "build_target_lib.h"
+
+extern void SetMediaVideoStreamSendCallback(fun_SetMediaVideoStreamSendCallback mediaVideoStreamSendCallback);
+extern fun_SetMediaVideoStreamSendCallback s_mediaVideoStreamSendCallback;
+#endif
+
 namespace media_manager {
 
 typedef utils::SharedPtr<MediaAdapterListener> MediaListenerPtr;

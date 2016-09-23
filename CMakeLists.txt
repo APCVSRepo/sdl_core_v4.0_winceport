@@ -49,6 +49,8 @@ option(ENABLE_SANITIZE "Sanitize tool" OFF)
 option(ENABLE_SECURITY "Security Ford protocol protection" ON)
 option(ENABLE_HMI_PTU_DECRYPTION "Policy table update parsed by hmi" ON)
 
+option(BUILD_TARGET_LIBRARY    "build target as library" OFF)
+
 set(OS_TYPE_OPTION 	"$ENV{OS_TYPE}")
 set(DEBUG_OPTION 	"$ENV{DEBUG}")
 set(HMI_TYPE_OPTION 	"$ENV{HMI_TYPE}")
@@ -262,6 +264,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "WindowsCE")
   set (EXTENDED_MEDIA_MODE OFF)
 endif()
 
+if(BUILD_TARGET_LIBRARY)
+add_definitions(-DBUILD_TARGET_LIB)
+endif()
 
 if (BUILD_USB_SUPPORT)
   add_definitions(-DUSB_SUPPORT)
@@ -416,6 +421,10 @@ endif()
 
 
 # Include direction and link library
+
+include_directories (
+${CMAKE_SOURCE_DIR}/include/all
+)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   include_directories (
     ${CMAKE_SOURCE_DIR}/include/win32

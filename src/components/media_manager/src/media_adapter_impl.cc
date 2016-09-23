@@ -33,6 +33,14 @@
 #include "media_manager/media_adapter_impl.h"
 #include "utils/logger.h"
 
+#ifdef BUILD_TARGET_LIB
+fun_SetMediaVideoStreamSendCallback s_mediaVideoStreamSendCallback = NULL;
+void SetMediaVideoStreamSendCallback(fun_SetMediaVideoStreamSendCallback mediaVideoStreamSendCallback)
+{
+	s_mediaVideoStreamSendCallback = mediaVideoStreamSendCallback;
+}
+#endif
+
 namespace media_manager {
 
 CREATE_LOGGERPTR_GLOBAL(logger_, "MediaManager")

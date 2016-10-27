@@ -38,7 +38,9 @@
 #include "security_manager/mock_security_manager_settings.h"
 #include "utils/custom_string.h"
 
+#if defined(OS_WIN32) || defined(OS_WINCE)
 #include "utils/global.h"
+#endif
 #include "config_profile/profile.h"
 
 using ::testing::Return;

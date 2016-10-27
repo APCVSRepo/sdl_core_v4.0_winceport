@@ -166,7 +166,7 @@ bool System::Execute(bool wait) {
 	  return false;
   }
   if (absCmd[0] != '\\' && absCmd[0] != '/') {
-    absCmd = Global::RelativePathToAbsPath(absCmd);
+    absCmd = Global::RelativePathToAbsPath(absCmd.c_str());
   }
 
   SHELLEXECUTEINFO ShExecInfo = {0};

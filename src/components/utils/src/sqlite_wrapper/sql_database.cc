@@ -65,7 +65,7 @@ bool SQLDatabase::Open() {
 #ifdef OS_WINCE
   std::string tmp = databasename_;
   if (tmp[0] != '\\' && tmp[0] != '/') {
-    tmp = Global::RelativePathToAbsPath(tmp);
+    tmp = Global::RelativePathToAbsPath(tmp.c_str());
   }
   error_ = sqlite3_open(tmp.c_str(), &conn_);
 #else
@@ -125,7 +125,7 @@ std::string SQLDatabase::get_path() const {
 #ifdef OS_WINCE
   std::string tmp = databasename_;
   if (tmp[0] != '\\' && tmp[0] != '/') {
-    tmp = Global::RelativePathToAbsPath(tmp);
+    tmp = Global::RelativePathToAbsPath(tmp.c_str());
   }
   return tmp;
 #else

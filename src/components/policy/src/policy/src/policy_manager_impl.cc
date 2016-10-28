@@ -55,8 +55,9 @@ __declspec(dllexport) policy::PolicyManager* CreateManager() {
 #else
 policy::PolicyManager* CreateManager() {
 #endif
-#if  defined(OS_WINCE)
-  profile::Profile::instance()->config_file_name(Global::RelativePathToAbsPath("smartDeviceLink.ini"));
+#if defined(OS_WINCE)
+  std::string absPath = Global::RelativePathToAbsPath("smartDeviceLink.ini");
+  profile::Profile::instance()->config_file_name(absPath);
 #else
   profile::Profile::instance()->config_file_name("smartDeviceLink.ini");
 #endif
@@ -989,7 +990,7 @@ bool PolicyManagerImpl::InitPT(const std::string& file_name,
 #ifdef OS_WINCE
   std::string tmp = file_name;
   if (tmp[0] != '\\' && tmp[0] != '/') {
-    tmp = Global::RelativePathToAbsPath(tmp);
+    tmp = Global::RelativePathToAbsPath(tmp.c_str());
   }
   const bool ret = cache_->Init(tmp, settings);
 #else

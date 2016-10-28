@@ -119,7 +119,6 @@ class Singleton {
 template<typename T, class Deleter>
 sync_primitives::Lock Singleton<T, Deleter>::lock_;
 
-
 template<typename T, class Deleter>
 T* Singleton<T, Deleter>::instance() {
 
@@ -164,12 +163,12 @@ void Singleton<T, Deleter>::destroy() {
 
 template<typename T, class Deleter>
 bool Singleton<T, Deleter>::exists() {
-  return *instance_pointer() != 0;
+  return (instance() != 0);
 }
 
 template<typename T, class Deleter>
 T** Singleton<T, Deleter>::instance_pointer() {
-  static T* instance = 0;
+  static T* instance=0;
   return &instance;
 }
 

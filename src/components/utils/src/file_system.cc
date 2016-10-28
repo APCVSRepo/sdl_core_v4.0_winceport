@@ -118,7 +118,7 @@ uint32_t file_system::FileSize(const std::string &path) {
   std::string absPath = path;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
 
   if (file_system::FileExists(absPath)) {
@@ -172,7 +172,7 @@ uint32_t file_system::DirectorySize(const std::string& path) {
     std::string absPath = path;
 
     if (absPath[0] != '\\' && absPath[0] != '/') {
-      absPath = Global::RelativePathToAbsPath(absPath);
+      absPath = Global::RelativePathToAbsPath(absPath.c_str());
     }
 
     HANDLE hFind = FindFirstFile(Global::StringToWString(absPath + "\\*.*").c_str(), &fData);
@@ -243,7 +243,7 @@ std::string file_system::CreateDirectoryWindows(const std::string& name) {
   std::wstring absPath;
 
   if (name[0] != '\\' && name[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(Global::StringToWString(name));
+    absPath = Global::RelativePathToAbsPath(Global::StringToWString(name).c_str());
   }
   else {
     absPath = Global::StringToWString(name);
@@ -294,7 +294,7 @@ bool file_system::CreateDirectoryRecursively(const std::string& path) {
   std::string desPath;
 
   if (fp[0] != '\\' && fp[0] != '/') {
-    fp = Global::RelativePathToAbsPath(fp);
+    fp = Global::RelativePathToAbsPath(fp.c_str());
   }
 
   if (fp.substr(fp.length() - 1, 1) != "\\") fp = fp + "\\";
@@ -333,7 +333,7 @@ bool file_system::IsDirectory(const std::string& name) {
 	}
 	return false;
 #elif defined(OS_WINCE)
-  int fileAttri = GetFileAttributes(Global::RelativePathToAbsPath(Global::StringToWString(name)).c_str());
+  int fileAttri = GetFileAttributes(Global::RelativePathToAbsPath(Global::StringToWString(name).c_str()).c_str());
 
 	if(fileAttri != -1) {
 		if (fileAttri & FILE_ATTRIBUTE_DIRECTORY) {
@@ -360,7 +360,7 @@ bool file_system::DirectoryExists(const std::string& name) {
 #elif defined(OS_WINCE)
   std::wstring tmp;
   if (name[0] != '\\' && name[0] != '/') {
-    tmp = Global::RelativePathToAbsPath(Global::StringToWString(name));
+    tmp = Global::RelativePathToAbsPath(Global::StringToWString(name).c_str());
   }
   else {
     tmp = Global::StringToWString(name);
@@ -391,7 +391,7 @@ bool file_system::FileExists(const std::string& name) {
   std::string absPath = name;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
 
   struct stat status;
@@ -415,7 +415,7 @@ bool file_system::Write(const std::string& file_name,
   std::string absName = file_name;
 
   if (absName[0] != '\\' && absName[0] != '/') {
-    absName = Global::RelativePathToAbsPath(absName);
+    absName = Global::RelativePathToAbsPath(absName.c_str());
   }
 
   std::ofstream file(absName.c_str(), std::ios_base::binary | mode);
@@ -452,7 +452,7 @@ std::ofstream* file_system::Open(const std::string& file_name,
   }
 #ifdef OS_WINCE
   if (file_name_[0] != '\\' && file_name_[0] != '/') {
-    file_name_ = Global::RelativePathToAbsPath(file_name_);
+    file_name_ = Global::RelativePathToAbsPath(file_name_.c_str());
   }
 #endif
   file->open(file_name_.c_str(), std::ios_base::binary | mode);
@@ -527,7 +527,7 @@ std::string file_system::GetAbsolutePath(const std::string& path) {
   std::string absPath = path;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
   
   if (DirectoryExists(absPath)) {
@@ -555,7 +555,7 @@ bool file_system::DeleteFileWindows(const std::string& name) {
   std::string absPath = name;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
 
   return ::DeleteFile(Global::StringToWString(absPath).c_str()) == TRUE;
@@ -594,7 +594,7 @@ void file_system::remove_directory_content(const std::string& directory_name) {
   WIN32_FIND_DATA fData;
   std::wstring wdirectory_name;
   if (directory_name[0] != '\\' && directory_name[0] != '/') {
-    wdirectory_name = Global::RelativePathToAbsPath(Global::StringToWString(directory_name));
+    wdirectory_name = Global::RelativePathToAbsPath(Global::StringToWString(directory_name).c_str());
   }
   else {
     wdirectory_name = Global::StringToWString(directory_name);
@@ -680,7 +680,7 @@ bool file_system::RemoveDirectoryWindows(const std::string& directory_name,
                                   bool is_recursively) {
   std::wstring tmp;
   if (directory_name[0] != '\\' && directory_name[0] != '/') {
-    tmp = Global::RelativePathToAbsPath(Global::StringToWString(directory_name));
+    tmp = Global::RelativePathToAbsPath(Global::StringToWString(directory_name).c_str());
   }
   else {
     tmp = Global::StringToWString(directory_name);
@@ -751,7 +751,7 @@ std::vector<std::string> file_system::ListFiles(
   std::string absName = directory_name;
 
   if (absName[0] != '\\' && absName[0] != '/') {
-    absName = Global::RelativePathToAbsPath(absName);
+    absName = Global::RelativePathToAbsPath(absName.c_str());
   }
 
   HANDLE hFind = ::FindFirstFile(Global::StringToWString(absName + "\\*.*").c_str(), &ffd);
@@ -820,7 +820,7 @@ bool file_system::WriteBinaryFile(const std::string& name,
   std::string absName = name;
 
   if (absName[0] != '\\' && absName[0] != '/') {
-    absName = Global::RelativePathToAbsPath(absName);
+    absName = Global::RelativePathToAbsPath(absName.c_str());
   }
 
   ofstream output(absName.c_str(), ios_base::binary | ios_base::trunc);
@@ -847,7 +847,7 @@ bool file_system::ReadBinaryFile(const std::string& name,
   std::string absName = name;
 
   if (absName[0] != '\\' && absName[0] != '/') {
-    absName = Global::RelativePathToAbsPath(absName);
+    absName = Global::RelativePathToAbsPath(absName.c_str());
   }
 
   if (!FileExists(absName) || !IsAccessible(absName, 0)) {
@@ -882,7 +882,7 @@ bool file_system::ReadFile(const std::string& name, std::string& result) {
   std::string absName = name;
 
   if (absName[0] != '\\' && absName[0] != '/') {
-    absName = Global::RelativePathToAbsPath(absName);
+    absName = Global::RelativePathToAbsPath(absName.c_str());
   }
   if (!FileExists(absName) || !IsAccessible(absName, 0)) {
     return false;
@@ -952,7 +952,7 @@ bool file_system::CreateFileWindows(const std::string& path) {
   std::string absPath = path;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
 
   file.open(absPath.c_str());

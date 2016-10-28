@@ -228,7 +228,7 @@ std::string Global::WStringToString(const std::wstring &wstr)
      return str; 
  }
 
-std::wstring Global::RelativePathToAbsPath(const std::wstring RelativePath)
+std::wstring Global::RelativePathToAbsPath(const wchar_t* RelativePath)
 {
   std::wstring strRet;
   std::vector<std::wstring> ItemPath;
@@ -249,9 +249,9 @@ std::wstring Global::RelativePathToAbsPath(const std::wstring RelativePath)
     }
   }
 
-  if (RelativePath.size() > MAX_PATH - 1) return L"";
+  if (wcslen(RelativePath) > MAX_PATH - 1) return L"";
 
-  int iSz = swprintf_s(tmpStr, MAX_PATH, L"%s", RelativePath.c_str());
+  int iSz = swprintf_s(tmpStr, MAX_PATH, L"%s", RelativePath);
 
   p1 = tmpStr;
   p2 = tmpStr;
@@ -280,13 +280,59 @@ std::wstring Global::RelativePathToAbsPath(const std::wstring RelativePath)
   return strRet;
 }
 
-std::string Global::RelativePathToAbsPath(const std::string RelativePath)
+std::string Global::RelativePathToAbsPath(const char* RelativePath)
 {
-  std::wstring tmp;
-  
-  tmp = RelativePathToAbsPath(Global::StringToWString(RelativePath));
+  std::string strRet;
+  std::vector<std::string> ItemPath;
 
-  return Global::WStringToString(tmp);
+  wchar_t wtmpStr[MAX_PATH] = {0};
+  std::string tmpStr;
+  const char *p1, *p2, *pEnd;
+
+  GetModuleFileNameW(NULL, wtmpStr, MAX_PATH);
+  
+  tmpStr = Global::WStringToString(wtmpStr);
+  p1 = tmpStr.c_str();
+  p2 = tmpStr.c_str();
+  pEnd = strrchr(tmpStr.c_str(), '\\');
+
+  for (; p2 <= pEnd; p2++) {
+    if ((*p2 == '\\' || *p2 == '/' || p2 == pEnd) && p1 < p2) {
+      ItemPath.push_back(std::string(p1, p2 - p1));
+      p1 = p2 + 1;
+    }
+  }
+
+  if (strlen(RelativePath) > MAX_PATH - 1) return "";
+
+  char RelBuf[MAX_PATH] = {0};
+  int iSz = sprintf_s(RelBuf, MAX_PATH, "%s", RelativePath);
+
+  p1 = RelBuf;
+  p2 = RelBuf;
+  pEnd = &RelBuf[iSz];
+
+  for (; p2 <= pEnd; p2++) {
+    if ((*p2 == '\\' || *p2 == '/'  || p2 == pEnd) && p1 < p2) {
+      std::string tmpStr = std::string(p1, p2 - p1);
+      if (tmpStr == ".") {
+      }
+      else if (tmpStr == "..") {
+        ItemPath.pop_back();
+      }
+      else {
+        ItemPath.push_back(tmpStr);
+      }
+      p1 = p2 + 1;
+    }
+  }
+
+  for (std::vector<std::string>::iterator it = ItemPath.begin(); it != ItemPath.end(); it++) {
+    strRet += *it + "\\";
+  }
+  strRet.erase(--strRet.end());
+
+  return strRet;
 }
 
 Global::Global()

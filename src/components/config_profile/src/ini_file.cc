@@ -117,7 +117,7 @@ char* ini_read_value(const char *fname,
   std::string absPath = fname;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
   fname = absPath.c_str();
 #endif
@@ -189,7 +189,7 @@ char ini_write_value(const char *fname,
   std::string absPath = fname;
 
   if (absPath[0] != '\\' && absPath[0] != '/') {
-    absPath = Global::RelativePathToAbsPath(absPath);
+    absPath = Global::RelativePathToAbsPath(absPath.c_str());
   }
   fname = absPath.c_str();
 #endif

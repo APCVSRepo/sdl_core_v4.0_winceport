@@ -1,1 +1,3 @@
-build*
+build
+build_win32
+build_wince

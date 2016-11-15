@@ -130,7 +130,7 @@
     
     #define ENABLE_LOGGER(logs_enabled)   
 
-    #define INIT_LOGGER(file_name)
+    #define INIT_LOGGER(file_name, logs_enabled)
 
     #define DEINIT_LOGGER()
     

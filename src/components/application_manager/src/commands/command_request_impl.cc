@@ -178,8 +178,13 @@ bool CommandRequestImpl::CheckSyntax(const std::string& str,
     LOG4CXX_ERROR(logger_, "CheckSyntax failed! :" << str);
     return false;
   }
+#if defined(OS_WINCE)
+  if (std::string::npos != str.find("\n") ||
+      std::string::npos != str.find("\t")) {
+#else
   if (std::string::npos != str.find("\\n") ||
       std::string::npos != str.find("\\t")) {
+#endif
     LOG4CXX_ERROR(logger_, "CheckSyntax failed! :" << str);
     return false;
   }

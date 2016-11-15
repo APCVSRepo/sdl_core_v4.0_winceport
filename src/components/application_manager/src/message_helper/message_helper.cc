@@ -2232,6 +2232,28 @@ mobile_apis::Result::eType MessageHelper::VerifyImage(
   }
 
   std::string full_file_path;
+#if /*defined(OS_WIN32) ||*/ defined(OS_WINCE)
+  if (file_name.size() > 0 && file_name[0] == '\\') {
+    full_file_path = file_name;
+  } else {
+    const std::string& app_storage_folder =
+        profile::Profile::instance()->app_storage_folder();
+    if (!app_storage_folder.empty()) {
+      // TODO(nvaganov@luxoft.com): APPLINK-11293
+      if (app_storage_folder[0] == '\\') {  // absolute path
+        full_file_path = app_storage_folder + "\\";
+      } else {  // relative path
+		  full_file_path = Global::RelativePathToAbsPath(app_storage_folder.c_str());
+      }
+    } else {  // empty app storage folder
+      full_file_path = Global::RelativePathToAbsPath(".");
+    }
+
+    full_file_path += app->folder_name();
+    full_file_path += "\\";
+    full_file_path += file_name;
+  }
+#else
   if (file_name.size() > 0 && file_name[0] == '/') {
     full_file_path = file_name;
   } else {
@@ -2253,6 +2275,7 @@ mobile_apis::Result::eType MessageHelper::VerifyImage(
     full_file_path += "/";
     full_file_path += file_name;
   }
+#endif
 
   if (!file_system::FileExists(full_file_path)) {
     return mobile_apis::Result::INVALID_DATA;

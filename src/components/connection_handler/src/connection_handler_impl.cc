@@ -922,11 +922,18 @@ void ConnectionHandlerImpl::OnConnectionEnded(
          session_map.end() != session_it; ++session_it) {
       const uint32_t session_key = KeyFromPair(connection_id, session_it->first);
       const ServiceList &service_list = session_it->second.service_list;
-      for (ServiceList::const_iterator service_it = service_list.begin(), end =
+#ifdef OS_WINCE
+      for (int i = service_list.size() - 1; i >= 0; i--) {
+        connection_handler_observer_->OnServiceEndedCallback(
+            session_key, service_list[i].service_type, CloseSessionReason::kCommon);
+      }
+#else
+	  for (ServiceList::const_iterator service_it = service_list.begin(), end =
            service_list.end(); service_it != end; ++service_it) {
         connection_handler_observer_->OnServiceEndedCallback(
             session_key, service_it->service_type, CloseSessionReason::kCommon);
       }
+#endif
     }
    }
  }

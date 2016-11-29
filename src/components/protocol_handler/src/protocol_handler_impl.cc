@@ -1317,7 +1317,7 @@ std::string ConvertPacketDataToString(const uint8_t *data,
 #ifndef OS_WINCE
   std::locale loc;
 #endif
-  const char *text = reinterpret_cast<const char*>(data);
+  const unsigned char *text = reinterpret_cast<const unsigned char*>(data);
   // Check data for printability
   for (size_t i = 0; i < data_size; ++i) {
 #if defined(OS_WIN32) || defined(OS_WINCE)
@@ -1329,7 +1329,7 @@ std::string ConvertPacketDataToString(const uint8_t *data,
       break;
     }
   }
-  return is_printable_array ? std::string(text, data_size) : std::string("is raw data");
+  return is_printable_array ? std::string((char *)text, data_size) : std::string("is raw data");
 }
 
 uint8_t ProtocolHandlerImpl::SupportedSDLProtocolVersion() const {

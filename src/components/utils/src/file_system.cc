@@ -35,7 +35,6 @@
 #if defined(OS_WIN32) || defined(OS_WINCE)
 #include <Windows.h>
 #include <sstream>
-#include <Shlobj.h>
 #include <Shlwapi.h>
 #include <sys/stat.h>
 #include <sys/types.h>
